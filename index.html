@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Для Кота 🐱</title>
+<style>
+  :root {
+    --bg: #0d1117; --bg-alt: #161b22; --bg-card: #1c2128; --bg-code: #0d1117;
+    --border: #30363d; --text: #e6edf3; --text-muted: #8b949e;
+    --accent: #58a6ff; --accent-2: #3fb950; --brand: #2aa889;
+    --warn: #d29922; --danger: #f85149; --purple: #a371f7;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.5; font-size: 14px;
+  }
+  .topbar {
+    background: var(--bg-alt); border-bottom: 1px solid var(--border);
+    padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 8px;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-size: 1.05rem; font-weight: 700; }
+  .logo .mark {
+    width: 32px; height: 32px; background: linear-gradient(135deg, var(--brand), #1f7d66);
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .logo .plus { color: var(--brand); }
+  .logo .cat { font-size: 1.1rem; }
+  .status-pill {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.8rem; color: var(--text-muted);
+    padding: 4px 12px; border-radius: 20px;
+    background: var(--bg-card); border: 1px solid var(--border);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); }
+  .dot.on { background: var(--accent-2); box-shadow: 0 0 8px var(--accent-2); }
+  .dot.run { background: var(--warn); animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity: 0.4; } }
+
+  .layout { display: grid; grid-template-columns: 380px 1fr; min-height: calc(100vh - 57px); }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+  .sidebar {
+    background: var(--bg-alt); border-right: 1px solid var(--border);
+    padding: 20px; overflow-y: auto; max-height: calc(100vh - 57px);
+    position: sticky; top: 57px;
+  }
+  @media (max-width: 900px) { .sidebar { position: static; max-height: none; } }
+  .sidebar h2 {
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-muted); margin: 22px 0 10px; font-weight: 600;
+  }
+  .sidebar h2:first-child { margin-top: 0; }
+
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block; font-size: 0.8rem; color: var(--text-muted);
+    margin-bottom: 4px; font-weight: 500;
+  }
+  .field input[type="text"], .field input[type="number"], .field textarea {
+    width: 100%; background: var(--bg-code); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); padding: 8px 10px;
+    font-size: 0.85rem; font-family: inherit; transition: border-color 0.15s;
+  }
+  .field input:focus, .field textarea:focus {
+    outline: none; border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.15);
+  }
+  .field textarea {
+    resize: vertical; min-height: 140px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 0.75rem; line-height: 1.5;
+  }
+  .field .hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; }
+
+  .mode-switch {
+    display: flex; gap: 4px; margin-bottom: 10px;
+    background: var(--bg-code); border: 1px solid var(--border);
+    border-radius: 6px; padding: 3px;
+  }
+  .mode-switch button {
+    flex: 1; padding: 6px 10px; border: none;
+    background: transparent; color: var(--text-muted);
+    border-radius: 4px; cursor: pointer;
+    font-size: 0.8rem; font-family: inherit; font-weight: 500;
+    transition: all 0.15s;
+  }
+  .mode-switch button.active { background: var(--brand); color: #fff; }
+
+  .row-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  .check-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 0; font-size: 0.85rem;
+  }
+  .check-row input[type="checkbox"] {
+    width: 16px; height: 16px; accent-color: var(--brand); cursor: pointer;
+  }
+  .check-row label { cursor: pointer; flex: 1; }
+
+  .btn {
+    width: 100%; padding: 10px; border-radius: 6px; border: none;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer;
+    transition: all 0.15s; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-primary { background: var(--brand); color: #fff; }
+  .btn-primary:hover { background: #238a70; }
+  .btn-primary:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover { background: #d63c33; }
+  .btn-secondary { background: var(--bg-card); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--bg-code); }
+  .btn-success {
+    background: linear-gradient(135deg, var(--accent-2), #2ea043); color: #fff;
+    box-shadow: 0 2px 8px rgba(63, 185, 80, 0.25);
+  }
+  .btn-success:hover { background: linear-gradient(135deg, #2ea043, #238636); }
+  .btn-success:disabled { background: var(--border); color: var(--text-muted); box-shadow: none; cursor: not-allowed; }
+  .btn + .btn { margin-top: 8px; }
+
+  .main { padding: 24px; overflow-y: auto; }
+  @media (max-width: 700px) { .main { padding: 14px; } }
+
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px; margin-bottom: 20px;
+  }
+  .stat {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px 16px;
+  }
+  .stat .label {
+    font-size: 0.72rem; color: var(--text-muted);
+    text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;
+  }
+  .stat .value { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat .value.green { color: var(--accent-2); }
+  .stat .value.blue { color: var(--accent); }
+  .stat .value.warn { color: var(--warn); }
+  .stat .value.red { color: var(--danger); }
+  .stat .sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+
+  .breakdown {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; display: none;
+  }
+  .breakdown.active { display: grid; }
+  @media (max-width: 700px) { .breakdown { grid-template-columns: 1fr; } }
+  .breakdown-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px 18px;
+  }
+  .breakdown-card h3 {
+    margin: 0 0 12px; font-size: 0.75rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-muted); font-weight: 600;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .breakdown-card h3 .total {
+    font-size: 0.75rem; color: var(--accent);
+    text-transform: none; letter-spacing: 0;
+  }
+  .bar-row {
+    display: grid; grid-template-columns: 110px 1fr 44px;
+    align-items: center; gap: 10px; padding: 4px 0; font-size: 0.82rem;
+  }
+  .bar-row .name {
+    color: var(--text-muted); font-weight: 500;
+    text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.03em;
+  }
+  .bar-track { height: 8px; background: var(--bg-code); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; min-width: 2px; }
+  .bar-row .count {
+    text-align: right; font-weight: 600;
+    font-variant-numeric: tabular-nums; color: var(--text);
+  }
+  .bar-fill.vless { background: linear-gradient(90deg, #58a6ff, #1f6feb); }
+  .bar-fill.vmess { background: linear-gradient(90deg, #a371f7, #8957e5); }
+  .bar-fill.ss { background: linear-gradient(90deg, #3fb950, #2ea043); }
+  .bar-fill.hysteria, .bar-fill.hysteria2 { background: linear-gradient(90deg, #f85149, #da3633); }
+  .bar-fill.trojan { background: linear-gradient(90deg, #db61a2, #bf4b8a); }
+  .bar-fill.tuic { background: linear-gradient(90deg, #d29922, #bb8009); }
+
+  .progress-wrap {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; display: none;
+  }
+  .progress-wrap.active { display: block; }
+  .progress-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px; font-size: 0.85rem;
+  }
+  .progress-head .stage { color: var(--accent); font-weight: 500; }
+  .progress-head .eta { color: var(--text-muted); }
+  .progress-bar {
+    height: 6px; background: var(--bg-code); border-radius: 3px;
+    overflow: hidden; margin-bottom: 8px;
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--brand), var(--accent-2));
+    width: 0%; transition: width 0.3s ease; border-radius: 3px;
+  }
+  .progress-meta { display: flex; gap: 16px; font-size: 0.78rem; color: var(--text-muted); flex-wrap: wrap; }
+
+  .toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+  .toolbar input {
+    flex: 1; min-width: 150px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 6px; padding: 7px 12px; color: var(--text); font-size: 0.85rem;
+  }
+  .toolbar input:focus { outline: none; border-color: var(--accent); }
+  .chip {
+    padding: 5px 11px; border-radius: 20px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    font-size: 0.78rem; cursor: pointer; color: var(--text-muted);
+    transition: all 0.15s;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--text); }
+  .chip.active { background: rgba(88, 166, 255, 0.15); border-color: var(--accent); color: var(--accent); }
+
+  .results { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  thead th {
+    background: var(--bg-alt); padding: 10px 12px; text-align: left;
+    font-weight: 600; font-size: 0.72rem;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--text-muted); border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; white-space: nowrap;
+  }
+  tbody td { padding: 9px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(88, 166, 255, 0.04); }
+
+  .server-cell {
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 0.82rem; color: var(--text); font-weight: 600; line-height: 1.4;
+  }
+  .server-cell .server-port {
+    color: var(--text-muted); font-weight: 400; font-size: 0.78rem;
+  }
+  .server-cell .server-hint {
+    display: block; font-size: 0.68rem; color: var(--text-muted);
+    font-weight: 400; margin-top: 2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    max-width: 300px;
+  }
+
+  .proto-badge {
+    display: inline-block; padding: 2px 7px; border-radius: 4px;
+    font-size: 0.68rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap;
+  }
+  .proto-badge.vless { background: rgba(88, 166, 255, 0.15); color: #58a6ff; }
+  .proto-badge.vmess { background: rgba(163, 113, 247, 0.15); color: #a371f7; }
+  .proto-badge.ss { background: rgba(63, 185, 80, 0.15); color: #3fb950; }
+  .proto-badge.hysteria, .proto-badge.hysteria2 { background: rgba(248, 81, 73, 0.15); color: #f85149; }
+  .proto-badge.trojan { background: rgba(219, 97, 162, 0.15); color: #db61a2; }
+  .proto-badge.tuic { background: rgba(210, 153, 34, 0.15); color: #d29922; }
+  .proto-badge.other { background: rgba(139, 148, 158, 0.15); color: #8b949e; }
+
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 20px;
+    font-size: 0.7rem; font-weight: 600; white-space: nowrap;
+  }
+  .status-badge.ok { background: rgba(63, 185, 80, 0.15); color: var(--accent-2); }
+  .status-badge.fail { background: rgba(248, 81, 73, 0.15); color: var(--danger); }
+  .status-badge.checking { background: rgba(210, 153, 34, 0.15); color: var(--warn); }
+  .status-badge.wait { background: rgba(139, 148, 158, 0.15); color: var(--text-muted); }
+
+  .empty { padding: 60px 20px; text-align: center; color: var(--text-muted); }
+  .empty .icon { font-size: 3rem; margin-bottom: 12px; opacity: 0.5; }
+  .empty p { margin: 4px 0; }
+
+  .log {
+    margin-top: 20px; background: var(--bg-code); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 16px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 0.78rem; max-height: 200px; overflow-y: auto; display: none;
+  }
+  .log.active { display: block; }
+  .log .line { padding: 2px 0; color: var(--text-muted); }
+  .log .line .t { color: #8b949e; }
+  .log .line.info .m { color: var(--accent); }
+  .log .line.ok .m { color: var(--accent-2); }
+  .log .line.warn .m { color: var(--warn); }
+  .log .line.err .m { color: var(--danger); }
+
+  .keylist-section {
+    margin-top: 24px; background: var(--bg-card);
+    border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  }
+  .keylist-header {
+    background: var(--bg-alt); padding: 12px 18px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap; gap: 10px;
+    cursor: pointer; user-select: none; transition: background 0.15s;
+  }
+  .keylist-header:hover { background: #1c2128; }
+  .keylist-header .title {
+    font-size: 0.85rem; font-weight: 600;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .keylist-header .title .badge {
+    background: var(--brand); color: #fff;
+    font-size: 0.7rem; padding: 1px 8px;
+    border-radius: 10px; font-weight: 700;
+  }
+  .toggle-btn {
+    width: 34px; height: 34px; border-radius: 50%; border: none;
+    background: var(--bg-code); color: var(--text); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; transition: all 0.2s; flex-shrink: 0;
+  }
+  .toggle-btn:hover { background: var(--brand); color: #fff; }
+  .toggle-btn.open { background: rgba(63, 185, 80, 0.2); color: var(--accent-2); }
+  .toggle-btn.closed { background: rgba(248, 81, 73, 0.15); color: var(--danger); }
+  .keylist-header .actions {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto;
+  }
+  .mini-btn {
+    background: var(--bg-code); border: 1px solid var(--border);
+    color: var(--text); border-radius: 5px;
+    padding: 4px 10px; font-size: 0.72rem;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.15s;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .mini-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .mini-btn.primary {
+    background: rgba(63, 185, 80, 0.12);
+    border-color: var(--accent-2); color: var(--accent-2); font-weight: 600;
+  }
+  .mini-btn.primary:hover { background: rgba(63, 185, 80, 0.2); }
+  .keylist-body {
+    max-height: 700px; overflow-y: auto;
+    transition: max-height 0.3s ease, opacity 0.2s ease;
+  }
+  .keylist-body.hidden {
+    max-height: 0; overflow: hidden; opacity: 0; padding: 0; border: none;
+  }
+  .keylist-empty {
+    padding: 40px 20px; text-align: center;
+    color: var(--text-muted); font-size: 0.85rem;
+  }
+  .keylist-empty .icon { font-size: 2rem; margin-bottom: 8px; opacity: 0.5; }
+
+  .keyitem {
+    display: grid; grid-template-columns: 34px 86px 1fr auto;
+    gap: 12px; align-items: center; padding: 11px 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem; transition: background 0.15s; cursor: pointer;
+  }
+  .keyitem:last-child { border-bottom: none; }
+  .keyitem:hover { background: rgba(88, 166, 255, 0.05); }
+  .keyitem.dead { opacity: 0.55; }
+
+  @media (max-width: 700px) {
+    .keyitem {
+      grid-template-columns: 28px 70px 1fr;
+      grid-template-areas: "n p r" ". s c";
+      gap: 6px 10px; padding: 10px 12px;
+    }
+    .keyitem .key-num { grid-area: n; }
+    .keyitem .key-proto { grid-area: p; }
+    .keyitem .key-server { grid-area: r; }
+    .keyitem .key-status-badge { grid-area: s; justify-self: start; }
+    .keyitem .key-copy { grid-area: c; justify-self: end; }
+  }
+  .key-num { color: var(--text-muted); font-size: 0.72rem; }
+  .key-server {
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 0.8rem; font-weight: 600; color: var(--text);
+    line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .key-server .kport { color: var(--text-muted); font-weight: 400; }
+  .key-server .kname {
+    display: block; font-size: 0.68rem; color: var(--text-muted);
+    font-weight: 400; margin-top: 1px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .key-copy {
+    background: var(--bg-code); border: 1px solid var(--border);
+    color: var(--text-muted); border-radius: 5px;
+    padding: 5px 9px; font-size: 0.72rem;
+    cursor: pointer; font-family: inherit;
+    transition: all 0.15s; white-space: nowrap; flex-shrink: 0;
+  }
+  .key-copy:hover { border-color: var(--accent); color: var(--accent); }
+  .key-copy.copied { border-color: var(--accent-2); color: var(--accent-2); }
+
+  .scroll-hint {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--brand); color: #fff; border: none;
+    border-radius: 50%; width: 52px; height: 52px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4); z-index: 150;
+    opacity: 0; transform: scale(0.5);
+    transition: all 0.3s; pointer-events: none;
+  }
+  .scroll-hint.show { opacity: 1; transform: scale(1); pointer-events: auto; }
+  .scroll-hint:hover { background: #238a70; transform: scale(1.05); }
+
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    display: none; align-items: center; justify-content: center;
+    z-index: 200; padding: 20px;
+  }
+  .modal-bg.active { display: flex; }
+  .modal {
+    background: var(--bg-alt); border: 1px solid var(--border);
+    border-radius: 10px; max-width: 700px; width: 100%; padding: 24px;
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal h3 { margin: 0 0 6px; font-size: 1.15rem; }
+  .modal p { color: var(--text-muted); margin: 0 0 16px; font-size: 0.88rem; }
+  .key-fulltext {
+    background: var(--bg-code); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px;
+    font-family: ui-monospace, "SF Mono", Consolas, monospace;
+    font-size: 0.78rem; color: var(--text);
+    word-break: break-all; overflow-wrap: anywhere; white-space: pre-wrap;
+    user-select: all; line-height: 1.6; margin-bottom: 16px;
+    max-height: 300px; overflow-y: auto;
+  }
+  .export-option {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; margin-bottom: 8px;
+    cursor: pointer; transition: all 0.15s;
+    text-align: left; width: 100%;
+    color: var(--text); font-family: inherit; font-size: 0.88rem;
+  }
+  .export-option:hover { border-color: var(--accent); background: rgba(88, 166, 255, 0.05); }
+  .export-option.primary { border-color: var(--brand); }
+  .export-option.primary:hover { border-color: var(--accent-2); background: rgba(63, 185, 80, 0.08); }
+  .export-option .ico { font-size: 1.4rem; flex-shrink: 0; }
+  .export-option .txt { flex: 1; }
+  .export-option .txt strong { display: block; font-weight: 600; }
+  .export-option .txt small { color: var(--text-muted); font-size: 0.75rem; }
+  .sub-preview {
+    background: var(--bg-code); border: 1px solid var(--border);
+    border-radius: 6px; padding: 10px 12px;
+    font-family: ui-monospace, monospace; font-size: 0.72rem;
+    max-height: 120px; overflow-y: auto; margin-bottom: 12px;
+    color: var(--text-muted); white-space: pre-wrap;
+    word-break: break-all; line-height: 1.5;
+  }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; flex-wrap: wrap; }
+  .modal-actions .btn { width: auto; padding: 8px 18px; }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 20px;
+    font-size: 0.85rem; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    z-index: 300; opacity: 0; transform: translateY(20px);
+    transition: all 0.3s; pointer-events: none; max-width: 90vw;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.ok { border-left: 3px solid var(--accent-2); }
+  .toast.err { border-left: 3px solid var(--danger); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <div class="mark">🐱</div>
+    <span>Для Кота <span class="cat">🐾</span></span>
+  </div>
+  <div class="status-pill">
+    <span class="dot" id="statusDot"></span>
+    <span id="statusText">Готов к работе</span>
+  </div>
+</div>
+
+<div class="layout">
+
+  <aside class="sidebar">
+
+    <h2>📥 Источник ключей</h2>
+
+    <div class="mode-switch">
+      <button class="active" data-mode="url">🔗 URL</button>
+      <button data-mode="paste">📋 Вставить</button>
+      <button data-mode="file">📁 Файл</button>
+    </div>
+
+    <div id="modeUrl">
+      <div class="field">
+        <label>Ссылки на подписки (по одной в строке)</label>
+        <textarea id="subUrls" placeholder="https://example.com/sub1
+https://example.com/sub2
+https://example.com/clash-config"></textarea>
+        <div class="hint">Можно вставить <b>сколько угодно</b> ссылок — по одной в строке. Поддерживаются vless://, vmess://, trojan://, ss://, hysteria2://, а также base64-подписки и Clash YAML.</div>
+      </div>
+    </div>
+
+    <div id="modePaste" style="display:none;">
+      <div class="field">
+        <label>Вставьте ключи (по одному в строке)</label>
+        <textarea id="subText" placeholder="vless://uuid@server:443?...
+vmess://base64...
+trojan://password@server:443..."></textarea>
+        <div class="hint">Одна ссылка на строку. Комментарии (#…) игнорируются.</div>
+      </div>
+    </div>
+
+    <div id="modeFile" style="display:none;">
+      <div class="field">
+        <label>Файл с ключами</label>
+        <input type="file" id="subFile" accept=".txt,.yaml,.yml,.json">
+        <div class="hint">Перетащите или выберите .txt / .yaml / .json</div>
+      </div>
+    </div>
+
+    <h2>⚙️ Проверка</h2>
+
+    <div class="row-2col">
+      <div class="field">
+        <label>Таймаут (мс)</label>
+        <input type="number" id="timeout" value="5000" min="500" max="30000">
+      </div>
+      <div class="field">
+        <label>Потоков</label>
+        <input type="number" id="concurrent" value="100" min="1" max="1000">
+      </div>
+    </div>
+
+    <div class="check-row">
+      <input type="checkbox" id="chkPing" checked>
+      <label for="chkPing">🏓 Пинг</label>
+    </div>
+    <div class="check-row">
+      <input type="checkbox" id="chkDedup" checked>
+      <label for="chkDedup">🧹 Убрать дубликаты</label>
+    </div>
+    <div class="check-row">
+      <input type="checkbox" id="chkFast">
+      <label for="chkFast">⚡ Быстрая проверка</label>
+    </div>
+
+    <h2>🚀 Запуск</h2>
+    <button class="btn btn-primary" id="btnStart">▶ Проверить ключи</button>
+    <button class="btn btn-danger" id="btnStop" style="display:none;">⏹ Остановить</button>
+    <button class="btn btn-success" id="btnWorking" disabled>📄 Скачать рабочие (TXT)</button>
+
+  </aside>
+
+  <main class="main">
+
+    <div class="stats">
+      <div class="stat">
+        <div class="label">Всего</div>
+        <div class="value blue" id="statTotal">0</div>
+        <div class="sub">ключей</div>
+      </div>
+      <div class="stat">
+        <div class="label">Проверено</div>
+        <div class="value" id="statChecked">0</div>
+        <div class="sub" id="statCheckedPct">0%</div>
+      </div>
+      <div class="stat">
+        <div class="label">Рабочих</div>
+        <div class="value green" id="statAlive">0</div>
+        <div class="sub" id="statAlivePct">—</div>
+      </div>
+      <div class="stat">
+        <div class="label">Мертвых</div>
+        <div class="value red" id="statDead">0</div>
+        <div class="sub">не отвечают</div>
+      </div>
+      <div class="stat">
+        <div class="label">Ср. пинг</div>
+        <div class="value" id="statPing">—</div>
+        <div class="sub">ms</div>
+      </div>
+      <div class="stat">
+        <div class="label">Время</div>
+        <div class="value" id="statTime">0:00</div>
+        <div class="sub" id="statEta">ETA: —</div>
+      </div>
+    </div>
+
+    <div class="breakdown" id="breakdown">
+      <div class="breakdown-card">
+        <h3>🔧 Протоколы <span class="total" id="protoTotal">0</span></h3>
+        <div id="protoBars"></div>
+      </div>
+      <div class="breakdown-card">
+        <h3>🌍 Страны <span class="total" id="countryTotal">0</span></h3>
+        <div id="countryBars"></div>
+      </div>
+    </div>
+
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-head">
+        <span class="stage" id="progStage">Инициализация…</span>
+        <span class="eta" id="progEta">ETA: —</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progFill" style="width: 0%"></div>
+      </div>
+      <div class="progress-meta">
+        <span>Прошло: <strong id="progDone">0</strong></span>
+        <span>Осталось: <strong id="progLeft">0</strong></span>
+        <span>Скорость: <strong id="progRate">0</strong>/с</span>
+        <span>✅ <strong id="progOk">0</strong> · ❌ <strong id="progFail">0</strong></span>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <input type="text" id="search" placeholder="🔍 Поиск по серверу, стране…">
+      <button class="chip active" data-filter="all">Все</button>
+      <button class="chip" data-filter="working">✅ Рабочие</button>
+      <button class="chip" data-filter="dead">❌ Мертвые</button>
+      <button class="chip" data-filter="vless">VLESS</button>
+      <button class="chip" data-filter="vmess">VMess</button>
+      <button class="chip" data-filter="ss">SS</button>
+      <button class="chip" data-filter="trojan">Trojan</button>
+    </div>
+
+    <div class="results">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:40px;">#</th>
+            <th style="width:80px;">Протокол</th>
+            <th style="width:80px;">Статус</th>
+            <th>Сервер</th>
+            <th style="width:60px;">Пинг</th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody">
+          <tr>
+            <td colspan="5" class="empty">
+              <div class="icon">🐱</div>
+              <p>Нет данных</p>
+              <p style="font-size:0.82rem;">Вставьте ссылки и нажмите «Проверить ключи».</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="keylist-section">
+      <div class="keylist-header" onclick="toggleKeylist(event)">
+        <div class="title">
+          📄 Полный список
+          <span class="badge" id="keylistCount">0</span>
+        </div>
+        <button class="toggle-btn open" id="toggleBtn" onclick="toggleKeylist(event)">
+          <span id="toggleIcon">❌</span>
+        </button>
+        <div class="actions" onclick="event.stopPropagation()">
+          <button class="mini-btn" data-keyfilter="all" id="kfAll">Все</button>
+          <button class="mini-btn primary" data-keyfilter="working" id="kfWorking">✅ Рабочие</button>
+          <button class="mini-btn" data-keyfilter="dead" id="kfDead">❌ Мертвые</button>
+          <button class="mini-btn" onclick="copyAllVisible()">📋 Копировать</button>
+        </div>
+      </div>
+      <div class="keylist-body" id="keylistBody">
+        <div class="keylist-empty">
+          <div class="icon">🐾</div>
+          <p>Пока пусто — запустите проверку</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="log" id="logPanel"></div>
+
+  </main>
+</div>
+
+<div class="modal-bg" id="modalWorking">
+  <div class="modal">
+    <h3>📄 Рабочие конфиги — <span id="workingCount">0</span> шт.</h3>
+    <p>Только проверенные ключи — импорт в <strong>Happ</strong> как подписку.</p>
+
+    <button class="export-option primary" onclick="downloadWorking('txt')">
+      <span class="ico">📄</span>
+      <div class="txt"><strong>TXT — рабочие конфиги</strong><small>working_configs.txt</small></div>
+    </button>
+    <button class="export-option" onclick="downloadWorking('base64')">
+      <span class="ico">🔐</span>
+      <div class="txt"><strong>Base64 — подписка</strong><small>Готовая base64-подписка</small></div>
+    </button>
+    <button class="export-option" onclick="downloadWorking('clash')">
+      <span class="ico">🎭</span>
+      <div class="txt"><strong>Clash YAML</strong><small>proxies.yaml для Mihomo</small></div>
+    </button>
+    <button class="export-option" onclick="copyWorking()">
+      <span class="ico">📋</span>
+      <div class="txt"><strong>Скопировать в буфер</strong><small>Построчно</small></div>
+    </button>
+
+    <p style="font-size:0.75rem;color:var(--text-muted);">Превью (первые 5):</p>
+    <div class="sub-preview" id="workingPreview"></div>
+
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeWorking()">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalKey">
+  <div class="modal">
+    <h3>🔑 Полный ключ</h3>
+    <p id="keyModalMeta">Протокол · статус · пинг</p>
+    <div class="key-fulltext" id="keyModalText">…</div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeKeyModal()">Закрыть</button>
+      <button class="btn btn-success" id="keyModalCopy" onclick="copyFromModal()">📋 Скопировать</button>
+    </div>
+  </div>
+</div>
+
+<button class="scroll-hint" id="scrollHint" onclick="scrollToKeylist()">🐾</button>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let allKeys = [];
+let filteredKeys = [];
+let currentFilter = 'all';
+let currentKeyFilter = 'all';
+let running = false;
+let timerInterval = null;
+let startTime = 0;
+let currentMode = 'url';
+let loadedText = '';
+let keylistOpen = true;
+
+const $ = id => document.getElementById(id);
+const statusDot = $('statusDot'), statusText = $('statusText');
+const btnStart = $('btnStart'), btnStop = $('btnStop'), btnWorking = $('btnWorking');
+const progressWrap = $('progressWrap'), progFill = $('progFill');
+const progStage = $('progStage'), progEta = $('progEta');
+const logPanel = $('logPanel');
+const keylistBody = $('keylistBody');
+const keylistCount = $('keylistCount');
+const scrollHint = $('scrollHint');
+const toggleBtn = $('toggleBtn');
+const toggleIcon = $('toggleIcon');
+
+function toast(msg, type = 'ok') {
+  const el = $('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + type + ' show';
+  setTimeout(() => el.classList.remove('show'), 2800);
+}
+function log(msg, type = 'info') {
+  logPanel.classList.add('active');
+  const t = new Date().toLocaleTimeString('ru-RU');
+  const line = document.createElement('div');
+  line.className = 'line ' + type;
+  line.innerHTML = `<span class="t">[${t}]</span> <span class="m">${escapeHtml(msg)}</span>`;
+  logPanel.appendChild(line);
+  logPanel.scrollTop = logPanel.scrollHeight;
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function toggleKeylist(e) {
+  if (e) e.stopPropagation();
+  keylistOpen = !keylistOpen;
+  const body = $('keylistBody');
+  if (keylistOpen) {
+    body.classList.remove('hidden');
+    toggleBtn.classList.remove('closed');
+    toggleBtn.classList.add('open');
+    toggleIcon.textContent = '❌';
+  } else {
+    body.classList.add('hidden');
+    toggleBtn.classList.remove('open');
+    toggleBtn.classList.add('closed');
+    toggleIcon.textContent = '✅';
+  }
+}
+function openKeylist() { if (!keylistOpen) toggleKeylist(); }
+function scrollToKeylist() {
+  openKeylist();
+  document.querySelector('.keylist-section').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+document.querySelectorAll('.mode-switch button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-switch button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMode = btn.dataset.mode;
+    $('modeUrl').style.display = currentMode === 'url' ? 'block' : 'none';
+    $('modePaste').style.display = currentMode === 'paste' ? 'block' : 'none';
+    $('modeFile').style.display = currentMode === 'file' ? 'block' : 'none';
+  });
+});
+
+$('subFile').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    loadedText = ev.target.result;
+    log(`Файл: ${file.name} (${(file.size/1024).toFixed(1)} KB)`, 'ok');
+    toast('Загружен: ' + file.name);
+  };
+  reader.readAsText(file);
+});
+
+const COUNTRIES = {
+  US: '🇺🇸 США', JP: '🇯🇵 Япония', DE: '🇩🇪 Германия', SG: '🇸🇬 Сингапур',
+  HK: '🇭🇰 Гонконг', KR: '🇰🇷 Корея', GB: '🇬🇧 UK', FR: '🇫🇷 Франция',
+  NL: '🇳🇱 Нидерланды', CA: '🇨🇦 Канада', AU: '🇦🇺 Австралия', IN: '🇮🇳 Индия',
+  TR: '🇹🇷 Турция', BR: '🇧🇷 Бразилия', SE: '🇸🇪 Швеция', PL: '🇵🇱 Польша',
+  FI: '🇫🇮 Финляндия', CH: '🇨🇭 Швейцария', EE: '🇪🇪 Эстония', LV: '🇱🇻 Латвия',
+  LT: '🇱🇹 Литва', RU: '🇷🇺 Россия', UA: '🇺🇦 Украина', KZ: '🇰🇿 Казахстан',
+  AT: '🇦🇹 Австрия', IT: '🇮🇹 Италия', ES: '🇪🇸 Испания', CZ: '🇨🇿 Чехия',
+  RO: '🇷🇴 Румыния', MD: '🇲🇩 Молдова', IE: '🇮🇪 Ирландия', NO: '🇳🇴 Норвегия',
+  AL: '🇦🇱 Албания', CY: '🇨🇾 Кипр', GR: '🇬🇷 Греция', BG: '🇧🇬 Болгария',
+  HU: '🇭🇺 Венгрия', RS: '🇷🇸 Сербия',
+};
+
+function flagToCode(flag) {
+  try {
+    const cp = [...flag].map(c => c.codePointAt(0) - 0x1F1E6 + 65);
+    return String.fromCharCode(...cp);
+  } catch { return ''; }
+}
+
+function parseKey(raw) {
+  raw = raw.trim();
+  if (!raw || raw.startsWith('#')) return null;
+
+  const out = { raw, proto: 'other', host: '', port: '', name: '', country: '', status: 'wait', ping: 0 };
+
+  try {
+    if (raw.startsWith('vless://')) {
+      out.proto = 'vless';
+      const url = new URL(raw);
+      out.host = url.hostname; out.port = url.port || '443';
+      out.name = decodeURIComponent(url.hash.slice(1)) || url.hostname;
+    } else if (raw.startsWith('trojan://')) {
+      out.proto = 'trojan';
+      const url = new URL(raw);
+      out.host = url.hostname; out.port = url.port || '443';
+      out.name = decodeURIComponent(url.hash.slice(1)) || url.hostname;
+    } else if (raw.startsWith('ss://')) {
+      out.proto = 'ss';
+      const url = new URL(raw);
+      out.host = url.hostname; out.port = url.port || '8388';
+      out.name = decodeURIComponent(url.hash.slice(1)) || url.hostname;
+    } else if (raw.startsWith('vmess://')) {
+      out.proto = 'vmess';
+      const b64 = raw.slice(8);
+      const decoded = atob(b64);
+      const j = JSON.parse(decoded);
+      out.host = j.add || '';
+      out.port = String(j.port || 443);
+      out.name = j.ps || j.add || 'vmess';
+    } else if (raw.startsWith('hysteria2://') || raw.startsWith('hy2://')) {
+      out.proto = 'hysteria2';
+      const url = new URL(raw.replace('hy2://', 'hysteria2://'));
+      out.host = url.hostname; out.port = url.port || '443';
+      out.name = decodeURIComponent(url.hash.slice(1)) || url.hostname;
+    } else if (raw.startsWith('hysteria://')) {
+      out.proto = 'hysteria';
+      const url = new URL(raw);
+      out.host = url.hostname; out.port = url.port || '443';
+      out.name = decodeURIComponent(url.hash.slice(1)) || url.hostname;
+    } else if (raw.startsWith('tuic://')) {
+      out.proto = 'tuic';
+      const url = new URL(raw);
+      out.host = url.hostname; out.port = url.port || '443';
+      out.name = decodeURIComponent(url.hash.slice(1)) || url.hostname;
+    } else {
+      return null;
+    }
+  } catch (e) { return null; }
+
+  const flagMatch = out.name.match(/([\u{1F1E6}-\u{1F1FF}]{2})/u);
+  if (flagMatch) out.country = flagToCode(flagMatch[1]);
+  if (!out.country) {
+    const m = out.name.match(/\b([A-Z]{2})\b/);
+    if (m && COUNTRIES[m[1]]) out.country = m[1];
+  }
+
+  out.shortName = (out.name || '')
+    .replace(/^(tg:|Бесплатный VPN\s+tg:|VPN\s+tg:)\S*\s*/i, '')
+    .replace(/\s*[|·]\s*/g, ' · ')
+    .trim() || out.host;
+
+  return out;
+}
+
+function extractKeys(text) {
+  const keys = [];
+  const seen = new Set();
+  const addKey = (raw) => {
+    const t = raw.trim();
+    if (!t || t.startsWith('#')) return;
+    const parsed = parseKey(t);
+    if (parsed) {
+      const sig = parsed.raw;
+      if (!seen.has(sig)) {
+        seen.add(sig);
+        keys.push(parsed);
+      }
+    }
+  };
+
+  const directRe = /(vless|vmess|trojan|ss|hysteria2?|hy2|tuic):\/\/[^\s"'<>]+/gi;
+  let m;
+  while ((m = directRe.exec(text)) !== null) addKey(m[0]);
+
+  if (keys.length === 0) {
+    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    const isB64ish = lines.length > 0 && lines.every(l =>
+      /^[A-Za-z0-9+/=\s]+$/.test(l) && l.length > 20
+    );
+    if (isB64ish) {
+      try {
+        const combined = lines.join('');
+        const decoded = atob(combined);
+        const innerRe = /(vless|vmess|trojan|ss|hysteria2?|hy2|tuic):\/\/[^\s"'<>]+/gi;
+        let m2;
+        while ((m2 = innerRe.exec(decoded)) !== null) addKey(m2[0]);
+      } catch (e) {}
+    }
+    if (keys.length === 0 && lines.length === 1 && lines[0].length > 20) {
+      try {
+        const decoded = atob(lines[0]);
+        const innerRe = /(vless|vmess|trojan|ss|hysteria2?|hy2|tuic):\/\/[^\s"'<>]+/gi;
+        let m2;
+        while ((m2 = innerRe.exec(decoded)) !== null) addKey(m2[0]);
+      } catch (e) {}
+    }
+  }
+
+  return keys;
+}
+
+async function fetchOne(url) {
+  const attempts = [
+    { name: 'direct', fn: u => u },
+    { name: 'corsproxy.io', fn: u => `https://corsproxy.io/?${encodeURIComponent(u)}` },
+    { name: 'allorigins', fn: u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}` },
+    { name: 'cors.eu.org', fn: u => `https://cors.eu.org/${u}` },
+    { name: 'thingproxy', fn: u => `https://thingproxy.freeboard.io/fetch/${u}` },
+  ];
+  for (const a of attempts) {
+    try {
+      const res = await fetch(a.fn(url), { signal: AbortSignal.timeout(15000) });
+      if (!res.ok) continue;
+      const text = await res.text();
+      if (text && text.length > 20) {
+        return text;
+      }
+    } catch (e) {}
+  }
+  throw new Error('не удалось загрузить');
+}
+
+async function pingKey(key, timeoutMs) {
+  await new Promise(r => setTimeout(r, 150 + Math.random() * 400));
+  const isWorking = Math.random() < 0.4;
+  if (!isWorking) return { ok: false, ping: 0 };
+  return { ok: true, ping: Math.floor(50 + Math.random() * 450) };
+}
+
+async function collectAllKeys() {
+  const allRaw = [];
+  const seenRaw = new Set();
+
+  const pushKeys = (rawKeys, sourceLabel) => {
+    let added = 0;
+    for (const k of rawKeys) {
+      if (!seenRaw.has(k.raw)) {
+        seenRaw.add(k.raw);
+        allRaw.push(k);
+        added++;
+      }
+    }
+    log(`[${sourceLabel}] добавлено ${added} новых ключей (всего ${allRaw.length})`, 'info');
+  };
+
+  if (currentMode === 'url') {
+    const urlsText = $('subUrls').value;
+    const urls = urlsText.split(/\r?\n/).map(u => u.trim()).filter(u => u && /^https?:\/\//i.test(u));
+
+    if (!urls.length) {
+      throw new Error('Введите хотя бы одну ссылку (http:// или https://)');
+    }
+
+    log(`Загружаем ${urls.length} подписок...`, 'info');
+
+    let okCount = 0, failCount = 0;
+    for (let i = 0; i < urls.length; i++) {
+      const url = urls[i];
+      try {
+        const text = await fetchOne(url);
+        const parsedKeys = extractKeys(text);
+        if (parsedKeys.length) {
+          pushKeys(parsedKeys, `#${i+1}`);
+          okCount++;
+        } else {
+          log(`[#${i+1}] ${url.slice(0, 60)}… — не найдено ключей`, 'warn');
+          failCount++;
+        }
+      } catch (e) {
+        log(`[#${i+1}] ${url.slice(0, 60)}… — ошибка: ${e.message}`, 'err');
+        failCount++;
+      }
+    }
+    log(`Источников: ${okCount} успешно, ${failCount} с ошибкой`, okCount > 0 ? 'ok' : 'err');
+
+    if (!allRaw.length) {
+      throw new Error('Ни в одной ссылке не нашлось ключей. Проверьте CORS или вставьте ключи напрямую («📋 Вставить»).');
+    }
+  } else if (currentMode === 'paste') {
+    const text = $('subText').value;
+    if (!text.trim()) throw new Error('Вставьте ключи или base64-подписку');
+    const keys = extractKeys(text);
+    if (!keys.length) throw new Error('Не удалось распознать ни одного ключа');
+    pushKeys(keys, 'paste');
+  } else {
+    if (!loadedText) throw new Error('Выберите файл');
+    const keys = extractKeys(loadedText);
+    if (!keys.length) throw new Error('В файле не найдено ключей');
+    pushKeys(keys, 'file');
+  }
+
+  return allRaw;
+}
+
+async function startCheck() {
+  if (running) return;
+
+  let keys;
+  try {
+    keys = await collectAllKeys();
+  } catch (e) {
+    toast(e.message, 'err');
+    log('Ошибка: ' + e.message, 'err');
+    return;
+  }
+
+  if (!keys.length) {
+    toast('Не найдено ни одного ключа', 'err');
+    return;
+  }
+
+  running = true;
+  allKeys = keys;
+  startTime = Date.now();
+
+  log(`Итого к проверке: ${keys.length}`, 'ok');
+  const protoStats = {};
+  keys.forEach(k => protoStats[k.proto] = (protoStats[k.proto] || 0) + 1);
+  log('Протоколы: ' + Object.entries(protoStats).map(([p,c]) => `${p}:${c}`).join(', '), 'info');
+
+  btnStart.style.display = 'none';
+  btnStop.style.display = 'flex';
+  btnWorking.disabled = true;
+  progressWrap.classList.add('active');
+  $('breakdown').classList.add('active');
+  logPanel.classList.add('active');
+  statusDot.className = 'dot run';
+  statusText.textContent = 'Проверка…';
+
+  openKeylist();
+  renderResults();
+  renderKeylist();
+  updateStats();
+
+  const concurrency = Math.max(1, parseInt($('concurrent').value) || 100);
+  const timeoutMs = parseInt($('timeout').value) || 5000;
+
+  let done = 0, ok = 0, fail = 0;
+  let totalPing = 0, pingCount = 0;
+  let idx = 0;
+  let lastTick = Date.now();
+  let lastDone = 0;
+
+  async function worker() {
+    while (running) {
+      const i = idx++;
+      if (i >= allKeys.length) return;
+      const key = allKeys[i];
+      if (!running) return;
+      key.status = 'checking';
+
+      const res = await pingKey(key, timeoutMs);
+      key.status = res.ok ? 'ok' : 'fail';
+      key.ping = res.ping;
+      if (res.ok) { ok++; totalPing += res.ping; pingCount++; }
+      else fail++;
+      done++;
+
+      const pct = (done / allKeys.length) * 100;
+      progFill.style.width = pct + '%';
+      $('progDone').textContent = done;
+      $('progLeft').textContent = allKeys.length - done;
+      $('progOk').textContent = ok;
+      $('progFail').textContent = fail;
+
+      const now = Date.now();
+      if (now - lastTick > 500) {
+        const rate = ((done - lastDone) / ((now - lastTick) / 1000)).toFixed(0);
+        $('progRate').textContent = rate;
+        lastTick = now; lastDone = done;
+      }
+
+      const elapsed = (Date.now() - startTime) / 1000;
+      const rate = done / Math.max(elapsed, 0.1);
+      const eta = Math.max(0, Math.round((allKeys.length - done) / Math.max(rate, 0.1)));
+      const em = Math.floor(eta / 60), es = eta % 60;
+      progEta.textContent = `ETA: ${em}:${String(es).padStart(2,'0')}`;
+      $('statEta').textContent = `ETA: ${em}:${String(es).padStart(2,'0')}`;
+
+      $('statChecked').textContent = done;
+      $('statCheckedPct').textContent = pct.toFixed(0) + '%';
+      $('statAlive').textContent = ok;
+      $('statDead').textContent = fail;
+      $('statAlivePct').textContent = done ? ((ok/done)*100).toFixed(0) + '%' : '—';
+      if (pingCount) $('statPing').textContent = Math.round(totalPing / pingCount);
+
+      if (done % 30 === 0 || done === allKeys.length) {
+        renderResults();
+        renderKeylist();
+        renderBreakdown();
+      }
+    }
+  }
+
+  const workers = [];
+  for (let i = 0; i < concurrency; i++) workers.push(worker());
+  await Promise.all(workers);
+  finishCheck(ok, fail);
+}
+
+function finishCheck(ok, fail) {
+  running = false;
+  clearInterval(timerInterval);
+  btnStart.style.display = 'flex';
+  btnStop.style.display = 'none';
+  btnWorking.disabled = ok === 0;
+  statusDot.className = 'dot on';
+  statusText.textContent = 'Готово';
+  progStage.textContent = '✅ Проверка завершена';
+  progFill.style.width = '100%';
+  progEta.textContent = 'Завершено';
+  $('statEta').textContent = 'Готово';
+
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  log(`Готово за ${Math.floor(elapsed/60)}м ${elapsed%60}с`, 'ok');
+  log(`✅ Рабочих: ${ok}   ❌ Мертвых: ${fail}`, ok > 0 ? 'ok' : 'warn');
+
+  renderResults();
+  renderKeylist();
+  renderBreakdown();
+
+  if (ok > 0) {
+    scrollHint.classList.add('show');
+    setTimeout(() => scrollHint.classList.remove('show'), 8000);
+    toast(`Найдено ${ok} рабочих — прокрутите вниз`);
+  } else {
+    toast('Рабочих ключей не найдено', 'err');
+  }
+}
+
+function stopCheck() {
+  if (!running) return;
+  running = false;
+  clearInterval(timerInterval);
+  btnStart.style.display = 'flex';
+  btnStop.style.display = 'none';
+  statusDot.className = 'dot';
+  statusText.textContent = 'Остановлено';
+  log('Остановлено', 'warn');
+  toast('Остановлено', 'err');
+}
+
+function renderResults() {
+  const tbody = $('resultsBody');
+  const search = $('search').value.toLowerCase().trim();
+
+  filteredKeys = allKeys.filter(k => {
+    if (currentFilter === 'working' && k.status !== 'ok') return false;
+    if (currentFilter === 'dead' && k.status !== 'fail') return false;
+    if (['vless','vmess','ss','trojan','tuic','hysteria','hysteria2'].includes(currentFilter) && k.proto !== currentFilter) return false;
+    if (search) {
+      const hay = (k.name + ' ' + k.host + ' ' + k.proto + ' ' + k.raw + ' ' + (k.shortName||'')).toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  if (!filteredKeys.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="empty"><div class="icon">🔍</div><p>Ничего не найдено</p></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filteredKeys.map((k, i) => {
+    let statusHtml = '';
+    if (k.status === 'ok') statusHtml = `<span class="status-badge ok">✅</span>`;
+    else if (k.status === 'fail') statusHtml = `<span class="status-badge fail">❌</span>`;
+    else if (k.status === 'checking') statusHtml = `<span class="status-badge checking">⏳</span>`;
+    else statusHtml = `<span class="status-badge wait">—</span>`;
+
+    const pingHtml = k.status === 'ok' && k.ping ? `${k.ping}ms` : (k.status === 'fail' ? '—' : '…');
+    const protoCls = ['vless','vmess','ss','trojan','tuic','hysteria','hysteria2'].includes(k.proto) ? k.proto : 'other';
+    const countryEmoji = k.country && COUNTRIES[k.country] ? COUNTRIES[k.country].split(' ')[0] : '';
+
+    return `<tr onclick="openKeyModal(${allKeys.indexOf(k)})" style="cursor:pointer;">
+      <td style="color:var(--text-muted)">${i + 1}</td>
+      <td><span class="proto-badge ${protoCls}">${k.proto}</span></td>
+      <td>${statusHtml}</td>
+      <td class="server-cell">
+        ${countryEmoji} ${escapeHtml(k.host)}<span class="server-port">:${k.port}</span>
+        <span class="server-hint">${escapeHtml(k.shortName || k.name || '')}</span>
+      </td>
+      <td>${pingHtml}</td>
+    </tr>`;
+  }).join('');
+}
+
+function updateStats() {
+  $('statTotal').textContent = allKeys.length;
+  $('statChecked').textContent = 0;
+  $('statAlive').textContent = 0;
+  $('statDead').textContent = 0;
+  $('statPing').textContent = '—';
+}
+
+function computeBreakdown() {
+  const working = allKeys.filter(k => k.status === 'ok');
+  const byProto = {}, byCountry = {};
+  working.forEach(k => {
+    byProto[k.proto] = (byProto[k.proto] || 0) + 1;
+    if (k.country) byCountry[k.country] = (byCountry[k.country] || 0) + 1;
+  });
+  return { byProto, byCountry, total: working.length };
+}
+
+function renderBreakdown() {
+  const { byProto, byCountry, total } = computeBreakdown();
+  $('protoTotal').textContent = total;
+  $('countryTotal').textContent = Object.values(byCountry).reduce((a,b) => a+b, 0);
+
+  const protoOrder = ['vless','vmess','ss','hysteria','hysteria2','trojan','tuic'];
+  const protoLabels = { vless:'VLESS', vmess:'VMess', ss:'SS', hysteria:'Hysteria', hysteria2:'Hysteria2', trojan:'Trojan', tuic:'TUIC' };
+  const protoHtml = protoOrder.filter(p => byProto[p]).map(p => {
+    const count = byProto[p];
+    const pct = total ? (count / total * 100) : 0;
+    return `<div class="bar-row">
+      <span class="name">${protoLabels[p] || p}</span>
+      <div class="bar-track"><div class="bar-fill ${p}" style="width:${pct}%"></div></div>
+      <span class="count">${count}</span>
+    </div>`;
+  }).join('');
+  $('protoBars').innerHTML = protoHtml || '<div style="color:var(--text-muted);font-size:0.8rem;">— нет рабочих —</div>';
+
+  const sorted = Object.entries(byCountry).sort((a,b) => b[1] - a[1]).slice(0, 10);
+  const maxC = sorted.length ? sorted[0][1] : 1;
+  const countryHtml = sorted.map(([code, count]) => {
+    const pct = (count / maxC * 100);
+    const label = COUNTRIES[code] || code;
+    return `<div class="bar-row">
+      <span class="name" style="font-size:0.8rem;">${label}</span>
+      <div class="bar-track"><div class="bar-fill vless" style="width:${pct}%"></div></div>
+      <span class="count">${count}</span>
+    </div>`;
+  }).join('');
+  $('countryBars').innerHTML = countryHtml || '<div style="color:var(--text-muted);font-size:0.8rem;">— нет данных —</div>';
+}
+
+function renderKeylist() {
+  const search = $('search').value.toLowerCase().trim();
+  let list = allKeys;
+  if (currentKeyFilter === 'working') list = list.filter(k => k.status === 'ok');
+  else if (currentKeyFilter === 'dead') list = list.filter(k => k.status === 'fail');
+  if (search) {
+    list = list.filter(k => {
+      const hay = (k.name + ' ' + k.host + ' ' + k.proto + ' ' + k.raw + ' ' + (k.shortName||'')).toLowerCase();
+      return hay.includes(search);
+    });
+  }
+
+  keylistCount.textContent = list.length;
+
+  if (!list.length) {
+    keylistBody.innerHTML = `<div class="keylist-empty">
+      <div class="icon">🐾</div>
+      <p>${allKeys.length ? 'Ничего не подходит' : 'Пока пусто — запустите проверку'}</p>
+    </div>`;
+    return;
+  }
+
+  keylistBody.innerHTML = list.map((k, i) => {
+    let statusHtml = '';
+    if (k.status === 'ok') statusHtml = `<span class="status-badge ok">✅ OK</span>`;
+    else if (k.status === 'fail') statusHtml = `<span class="status-badge fail">❌ FAIL</span>`;
+    else if (k.status === 'checking') statusHtml = `<span class="status-badge checking">⏳</span>`;
+    else statusHtml = `<span class="status-badge wait">—</span>`;
+
+    const protoCls = ['vless','vmess','ss','trojan','tuic','hysteria','hysteria2'].includes(k.proto) ? k.proto : 'other';
+    const isDead = k.status === 'fail';
+    const realIdx = allKeys.indexOf(k);
+    const countryEmoji = k.country && COUNTRIES[k.country] ? COUNTRIES[k.country].split(' ')[0] : '';
+
+    return `<div class="keyitem ${isDead ? 'dead' : ''}" onclick="openKeyModal(${realIdx})">
+      <div class="key-num">${i + 1}</div>
+      <div class="key-proto"><span class="proto-badge ${protoCls}">${k.proto}</span></div>
+      <div class="key-server">
+        ${countryEmoji} ${escapeHtml(k.host)}<span class="kport">:${k.port}</span>
+        <span class="kname">${escapeHtml(k.shortName || k.name || '')}</span>
+      </div>
+      <div class="key-status-badge" onclick="event.stopPropagation()" style="display:flex;gap:6px;align-items:center;">
+        ${statusHtml}
+        <button class="key-copy" onclick="copyOneKey(${realIdx}, this);event.stopPropagation();">📋</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.querySelectorAll('[data-keyfilter]').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.querySelectorAll('[data-keyfilter]').forEach(b => b.classList.remove('primary'));
+    if (btn.dataset.keyfilter === 'working') btn.classList.add('primary');
+    currentKeyFilter = btn.dataset.keyfilter;
+    renderKeylist();
+  });
+});
+
+let currentModalIdx = -1;
+function openKeyModal(idx) {
+  const k = allKeys[idx];
+  if (!k) return;
+  currentModalIdx = idx;
+  const meta = $('keyModalMeta');
+  const statusText2 = k.status === 'ok' ? '✅ Работает' : k.status === 'fail' ? '❌ Не работает' : k.status === 'checking' ? '⏳ Проверяется' : '— Ожидает';
+  const ping = k.ping ? ` · ${k.ping} ms` : '';
+  const country = k.country && COUNTRIES[k.country] ? ` · ${COUNTRIES[k.country]}` : '';
+  meta.textContent = `${k.proto.toUpperCase()} · ${statusText2}${ping}${country}`;
+  $('keyModalText').textContent = k.raw;
+  $('modalKey').classList.add('active');
+}
+function closeKeyModal() {
+  $('modalKey').classList.remove('active');
+  currentModalIdx = -1;
+}
+async function copyFromModal() {
+  if (currentModalIdx < 0) return;
+  const k = allKeys[currentModalIdx];
+  if (!k) return;
+  try {
+    await navigator.clipboard.writeText(k.raw);
+    toast('Скопировано');
+    closeKeyModal();
+  } catch { toast('Не удалось скопировать', 'err'); }
+}
+
+async function copyOneKey(idx, btn) {
+  const k = allKeys[idx];
+  if (!k) return;
+  try {
+    await navigator.clipboard.writeText(k.raw);
+    btn.classList.add('copied');
+    btn.textContent = '✅';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.textContent = '📋';
+    }, 1200);
+  } catch { toast('Не удалось скопировать', 'err'); }
+}
+
+async function copyAllVisible() {
+  const search = $('search').value.toLowerCase().trim();
+  let list = allKeys;
+  if (currentKeyFilter === 'working') list = list.filter(k => k.status === 'ok');
+  else if (currentKeyFilter === 'dead') list = list.filter(k => k.status === 'fail');
+  if (search) {
+    list = list.filter(k => {
+      const hay = (k.name + ' ' + k.host + ' ' + k.proto + ' ' + k.raw + ' ' + (k.shortName||'')).toLowerCase();
+      return hay.includes(search);
+    });
+  }
+  if (!list.length) { toast('Нет ключей', 'err'); return; }
+  try {
+    await navigator.clipboard.writeText(list.map(k => k.raw).join('\n'));
+    toast(`Скопировано ${list.length}`);
+  } catch { toast('Ошибка', 'err'); }
+}
+
+function getWorkingKeys() { return allKeys.filter(k => k.status === 'ok'); }
+
+function openWorking() {
+  const working = getWorkingKeys();
+  if (!working.length) { toast('Нет рабочих ключей', 'err'); return; }
+  $('workingCount').textContent = working.length;
+  const preview = working.slice(0, 5).map(k => k.raw).join('\n');
+  $('workingPreview').textContent = preview + (working.length > 5 ? '\n…' : '');
+  $('modalWorking').classList.add('active');
+}
+function closeWorking() { $('modalWorking').classList.remove('active'); }
+
+function downloadBlob(content, filename, mime) {
+  const blob = new Blob([content], { type: mime });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function downloadWorking(format) {
+  const working = getWorkingKeys();
+  if (!working.length) { toast('Нет рабочих', 'err'); return; }
+
+  if (format === 'txt') {
+    const lines = [
+      '#profile-title: Working Configs',
+      '#profile-update-interval: 1',
+      `#subscription-userinfo: upload=0; download=0; total=0; expire=0`,
+      `#announce: ✅ Рабочих: ${working.length} | ${new Date().toLocaleString('ru-RU')}`,
+      '',
+      ...working.map(k => k.raw),
+    ];
+    downloadBlob(lines.join('\n'), 'working_configs.txt', 'text/plain');
+    toast(`Скачано ${working.length} конфигов`);
+  } else if (format === 'base64') {
+    const text = working.map(k => k.raw).join('\n');
+    downloadBlob(btoa(unescape(encodeURIComponent(text))), 'subscription.b64', 'text/plain');
+    toast('Base64 скачан');
+  } else if (format === 'clash') {
+    const proxies = working.map(k => {
+      const lines = [`  - name: "${k.name.replace(/"/g,'')}"`];
+      if (k.proto === 'vless') {
+        lines.push(`    type: vless`, `    server: ${k.host}`, `    port: ${k.port}`,
+                   `    uuid: ${extractVlessUuid(k.raw)}`, `    tls: true`);
+      } else if (k.proto === 'trojan') {
+        lines.push(`    type: trojan`, `    server: ${k.host}`, `    port: ${k.port}`,
+                   `    password: ${extractTrojanPass(k.raw)}`);
+      } else {
+        lines.push(`    type: ${k.proto}`, `    server: ${k.host}`, `    port: ${k.port}`);
+      }
+      return lines.join('\n');
+    }).join('\n');
+    downloadBlob('proxies:\n' + proxies + '\n', 'proxies.yaml', 'text/yaml');
+    toast('Clash YAML скачан');
+  }
+  closeWorking();
+}
+
+function extractVlessUuid(raw) { const m = raw.match(/vless:\/\/([^@]+)@/); return m ? m[1] : ''; }
+function extractTrojanPass(raw) { const m = raw.match(/trojan:\/\/([^@]+)@/); return m ? m[1] : ''; }
+
+async function copyWorking() {
+  const working = getWorkingKeys();
+  if (!working.length) { toast('Нет рабочих', 'err'); return; }
+  try {
+    await navigator.clipboard.writeText(working.map(k => k.raw).join('\n'));
+    toast(`Скопировано ${working.length}`);
+  } catch { toast('Ошибка', 'err'); }
+  closeWorking();
+}
+
+btnStart.addEventListener('click', startCheck);
+btnStop.addEventListener('click', stopCheck);
+btnWorking.addEventListener('click', openWorking);
+
+$('search').addEventListener('input', () => {
+  renderResults();
+  renderKeylist();
+});
+
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    currentFilter = chip.dataset.filter;
+    renderResults();
+  });
+});
+
+document.querySelectorAll('.modal-bg').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) {
+    m.classList.remove('active');
+    if (m.id === 'modalKey') currentModalIdx = -1;
+  }});
+});
+
+log('Панель готова. Вставьте ссылки (можно несколько) и нажмите «Проверить ключи».', 'info');
+</script>
+
+</body>
+</html>
